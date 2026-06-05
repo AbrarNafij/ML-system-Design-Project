@@ -1,0 +1,33 @@
+stages:
+  data_ingestion:
+    cmd: python src/stage_01_data_ingestion.py
+    deps:
+      - data/raw/GSE5281_series_matrix.txt
+      - data/raw/GSE5281_sample_characteristics.xls
+      - src/stage_01_data_ingestion.py
+
+  data_preprocessing:
+    cmd: python src/stage_02_data_preprocessing.py
+    deps:
+      - data/raw/GSE5281_series_matrix.txt
+      - data/raw/GSE5281_sample_characteristics.xls
+      - src/stage_02_data_preprocessing.py
+    outs:
+      - data/processed/matrix_clean.csv
+
+  statistical_analysis:
+    cmd: python src/stage_03_statistical_analysis.py
+    deps:
+      - data/processed/matrix_clean.csv
+      - src/stage_03_statistical_analysis.py
+    outs:
+      - data/processed/significant_genes.csv
+
+  data_visualization:
+    cmd: python src/stage_04_data_visualization.py
+    deps:
+      - data/processed/significant_genes.csv
+      - src/stage_04_data_visualization.py
+    outs:
+      - data/processed/volcano_plot.png
+      - data/processed/expression_heatmap.png
