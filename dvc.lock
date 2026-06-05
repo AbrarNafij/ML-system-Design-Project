@@ -1,0 +1,73 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/stage_01_data_ingestion.py
+    deps:
+    - path: data/raw/GSE5281_sample_characteristics.xls
+      hash: md5
+      md5: 46398127950b137f05451a7219f84d9e
+      size: 85504
+    - path: data/raw/GSE5281_series_matrix.txt
+      hash: md5
+      md5: cb0818a4dcb41a5fcfedc04eb6d90046
+      size: 77423137
+    - path: src/stage_01_data_ingestion.py
+      hash: md5
+      md5: aafad7d9f5b0e90d0743303d939079e2
+      size: 741
+  data_preprocessing:
+    cmd: python src/stage_02_data_preprocessing.py
+    deps:
+    - path: data/raw/GSE5281_sample_characteristics.xls
+      hash: md5
+      md5: 46398127950b137f05451a7219f84d9e
+      size: 85504
+    - path: data/raw/GSE5281_series_matrix.txt
+      hash: md5
+      md5: cb0818a4dcb41a5fcfedc04eb6d90046
+      size: 77423137
+    - path: src/stage_02_data_preprocessing.py
+      hash: md5
+      md5: 902aa8203b7f96d53760c6a3b36d41df
+      size: 2805
+    outs:
+    - path: data/processed/matrix_clean.csv
+      hash: md5
+      md5: 6c4969f086e4537bd1abac58f9227a4d
+      size: 77149252
+  statistical_analysis:
+    cmd: python src/stage_03_statistical_analysis.py
+    deps:
+    - path: data/processed/matrix_clean.csv
+      hash: md5
+      md5: 6c4969f086e4537bd1abac58f9227a4d
+      size: 77149252
+    - path: src/stage_03_statistical_analysis.py
+      hash: md5
+      md5: 2ae90610232b8cc6b93c12cbbc8606e7
+      size: 1331
+    outs:
+    - path: data/processed/significant_genes.csv
+      hash: md5
+      md5: e62bb7b847bf3f125a7e6803f156a47a
+      size: 295516
+  data_visualization:
+    cmd: python src/stage_04_data_visualization.py
+    deps:
+    - path: data/processed/significant_genes.csv
+      hash: md5
+      md5: e62bb7b847bf3f125a7e6803f156a47a
+      size: 295516
+    - path: src/stage_04_data_visualization.py
+      hash: md5
+      md5: 712915723b55fb0bca315a0d461623a9
+      size: 1171
+    outs:
+    - path: data/processed/expression_heatmap.png
+      hash: md5
+      md5: 8b3fc2fad45a0e09e2731c48a25bc796
+      size: 47018
+    - path: data/processed/volcano_plot.png
+      hash: md5
+      md5: 4ca8680dad06f0eb359900de9d7a07e5
+      size: 57196
