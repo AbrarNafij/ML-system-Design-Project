@@ -1,0 +1,11 @@
+/matrix_clean.csv
+/significant_genes.csv
+/volcano_plot.png
+/expression_heatmap.png
+/expression_log2.csv
+/differential_expression_results.csv
+/selected_genes.csv
+/ml_features.csv
+/ml_labels.csv
+/classification_report.csv
+/confusion_matrix.csv

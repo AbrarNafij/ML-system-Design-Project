@@ -1,33 +1,55 @@
 stages:
-  data_ingestion:
-    cmd: python src/stage_01_data_ingestion.py
+  ml_data_integration:
+    cmd: python src/ml_01_data_integration.py
     deps:
       - data/raw/GSE5281_series_matrix.txt
-      - data/raw/GSE5281_sample_characteristics.xls
-      - src/stage_01_data_ingestion.py
-
-  data_preprocessing:
-    cmd: python src/stage_02_data_preprocessing.py
-    deps:
-      - data/raw/GSE5281_series_matrix.txt
-      - data/raw/GSE5281_sample_characteristics.xls
-      - src/stage_02_data_preprocessing.py
+      - src/ml_common.py
+      - src/ml_01_data_integration.py
     outs:
-      - data/processed/matrix_clean.csv
+      - data/interim/expression_matrix.csv
+      - data/interim/sample_metadata.csv
 
-  statistical_analysis:
-    cmd: python src/stage_03_statistical_analysis.py
+  ml_data_cleaning_processing:
+    cmd: python src/ml_02_data_cleaning_processing.py
     deps:
-      - data/processed/matrix_clean.csv
-      - src/stage_03_statistical_analysis.py
+      - data/interim/expression_matrix.csv
+      - data/interim/sample_metadata.csv
+      - src/ml_common.py
+      - src/ml_02_data_cleaning_processing.py
     outs:
-      - data/processed/significant_genes.csv
+      - data/processed/expression_log2.csv
+      - data/processed/differential_expression_results.csv
+      - data/processed/selected_genes.csv
+      - data/processed/ml_features.csv
+      - data/processed/ml_labels.csv
+      - models/preprocessor.joblib
 
-  data_visualization:
-    cmd: python src/stage_04_data_visualization.py
+  ml_model_training:
+    cmd: python src/ml_03_model_training.py --epochs 150
     deps:
-      - data/processed/significant_genes.csv
-      - src/stage_04_data_visualization.py
+      - data/processed/ml_features.csv
+      - data/processed/ml_labels.csv
+      - src/ml_common.py
+      - src/ml_03_model_training.py
     outs:
-      - data/processed/volcano_plot.png
-      - data/processed/expression_heatmap.png
+      - models/contrastive_encoder.joblib
+      - models/random_forest_classifier.joblib
+      - models/training_split.joblib
+
+  ml_model_evaluation:
+    cmd: python src/ml_04_model_evaluation.py
+    deps:
+      - data/processed/ml_features.csv
+      - data/processed/ml_labels.csv
+      - models/contrastive_encoder.joblib
+      - models/random_forest_classifier.joblib
+      - models/training_split.joblib
+      - src/ml_common.py
+      - src/ml_03_model_training.py
+      - src/ml_04_model_evaluation.py
+    metrics:
+      - data/processed/model_metrics.json:
+          cache: false
+    outs:
+      - data/processed/classification_report.csv
+      - data/processed/confusion_matrix.csv
