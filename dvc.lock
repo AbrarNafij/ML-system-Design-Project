@@ -148,3 +148,59 @@ stages:
       hash: md5
       md5: 5653c783174b5caffd4290ac73a881ec
       size: 186
+  ml_visualization:
+    cmd: python src/ml_05_visualization.py
+    deps:
+    - path: data/processed/confusion_matrix.csv
+      hash: md5
+      md5: 5d51e763380536338e91cf4e8248d2d8
+      size: 57
+    - path: data/processed/differential_expression_results.csv
+      hash: md5
+      md5: 4b3628b74298e2f6b5a3490c264e9474
+      size: 3798640
+    - path: data/processed/expression_log2.csv
+      hash: md5
+      md5: a5a8d378386c223126f9b6c8a6523caf
+      size: 160451158
+    - path: data/processed/ml_features.csv
+      hash: md5
+      md5: ccf9d912bf0b8cffc1415184f6ccf247
+      size: 15802824
+    - path: data/processed/ml_labels.csv
+      hash: md5
+      md5: b1efec5c8e3b312e71d6c2d811e5f948
+      size: 8310
+    - path: models/contrastive_encoder.joblib
+      hash: md5
+      md5: f8acd8a0dca3d0c5ed4721c2de939667
+      size: 21651215
+    - path: src/ml_03_model_training.py
+      hash: md5
+      md5: d7d00133abb5ea69f0f835b809a2294c
+      size: 4399
+    - path: src/ml_05_visualization.py
+      hash: md5
+      md5: eb7a5ec921bb45f890dedc4db4e1d197
+      size: 4398
+    - path: src/ml_common.py
+      hash: md5
+      md5: 70ba2993961ddc9711b868f9f327f726
+      size: 4645
+    outs:
+    - path: data/processed/figures/confusion_matrix.png
+      hash: md5
+      md5: 97cf0189c77046b54bd85477d9838582
+      size: 65699
+    - path: data/processed/figures/latent_pca.png
+      hash: md5
+      md5: 5c8d947681f6d35de39ead71f83062fb
+      size: 217872
+    - path: data/processed/figures/top_probe_heatmap.png
+      hash: md5
+      md5: 1d37783669a0d21492195485ec1e4683
+      size: 239550
+    - path: data/processed/figures/volcano_plot.png
+      hash: md5
+      md5: 0bb57e762957d23f48c5dfdad9faba99
+      size: 585741

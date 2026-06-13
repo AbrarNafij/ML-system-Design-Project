@@ -53,3 +53,21 @@ stages:
     outs:
       - data/processed/classification_report.csv
       - data/processed/confusion_matrix.csv
+
+  ml_visualization:
+    cmd: python src/ml_05_visualization.py
+    deps:
+      - data/processed/differential_expression_results.csv
+      - data/processed/expression_log2.csv
+      - data/processed/ml_features.csv
+      - data/processed/ml_labels.csv
+      - data/processed/confusion_matrix.csv
+      - models/contrastive_encoder.joblib
+      - src/ml_common.py
+      - src/ml_03_model_training.py
+      - src/ml_05_visualization.py
+    outs:
+      - data/processed/figures/volcano_plot.png
+      - data/processed/figures/top_probe_heatmap.png
+      - data/processed/figures/latent_pca.png
+      - data/processed/figures/confusion_matrix.png
