@@ -7,14 +7,12 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
-import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from ml_03_model_training import ContrastiveEncoder  # noqa: E402
 from ml_common import MODELS_DIR, PROCESSED_DIR  # noqa: E402
 
 LABEL_NAMES = {0: "Control", 1: "AD"}
@@ -29,6 +27,8 @@ class ModelPredictor:
         self.feature_index: pd.Index | None = None
         self.labels_df: pd.DataFrame | None = None
         self._loaded = False
+        # Lazy-loaded libraries (populated in load())
+        self.torch = None
 
     @property
     def is_loaded(self) -> bool:
@@ -48,6 +48,12 @@ class ModelPredictor:
         self.encoder_artifact = joblib.load(encoder_path)
         self.classifier = joblib.load(classifier_path)
         self.preprocessor = joblib.load(preprocessor_path)
+
+        # Import heavy ML libs lazily to avoid blocking app startup
+        import torch
+        from ml_03_model_training import ContrastiveEncoder
+
+        self.torch = torch
 
         self.encoder = ContrastiveEncoder(
             input_dim=self.encoder_artifact["input_dim"],
@@ -138,8 +144,9 @@ class ModelPredictor:
 
     def _encode(self, features: np.ndarray) -> np.ndarray:
         assert self.encoder is not None
-        with torch.no_grad():
-            tensor = torch.tensor(features, dtype=torch.float32)
+        assert self.torch is not None
+        with self.torch.no_grad():
+            tensor = self.torch.tensor(features, dtype=self.torch.float32)
             return self.encoder(tensor).numpy()
 
     def _classify(self, latents: np.ndarray) -> list[dict]:
@@ -164,4 +171,4 @@ class ModelPredictor:
 
     def _ensure_loaded(self) -> None:
         if not self._loaded:
-            raise RuntimeError("Models are not loaded.")
+            self.load()

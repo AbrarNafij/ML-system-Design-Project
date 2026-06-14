@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+import os
 
 import numpy as np
 from fastapi import FastAPI, HTTPException
@@ -21,10 +22,15 @@ from api.schemas import (
 
 predictor = ModelPredictor()
 
+# Enable a development mode that skips loading large ML artifacts at startup.
+# Set the environment variable `API_DEV_MODE=1` to enable dev mode.
+DEV_MODE = os.getenv("API_DEV_MODE", "0") == "1"
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    predictor.load()
+    if not DEV_MODE:
+        predictor.load()
     yield
 
 
@@ -55,6 +61,16 @@ def metrics() -> MetricsResponse:
         return MetricsResponse(**predictor.get_metrics())
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/model/load", tags=["model"])
+def load_models() -> dict:
+    """Trigger model loading at runtime (useful in dev mode)."""
+    try:
+        predictor.load()
+        return {"loaded": True}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 @app.get("/samples", response_model=SampleListResponse, tags=["data"])
